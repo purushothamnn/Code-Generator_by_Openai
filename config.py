@@ -1,0 +1,1 @@
+API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxx"  # Replace with your actual API key

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Application Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        async function generateApp(event) {
+            event.preventDefault();
+
+            const appRequirement = document.getElementById('app_requirement').value;
+            const folderName = document.getElementById('fileName').value;
+            const resultContainer = document.getElementById('result-container');
+            const loadingCircle = document.getElementById('loading-circle');
+
+            resultContainer.innerHTML = '';
+            loadingCircle.style.display = 'block';
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `app_requirement=${encodeURIComponent(appRequirement)}&fileName=${encodeURIComponent(folderName)}`,
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    resultContainer.innerHTML = `<div class="success-message">${result.message}</div>`;
+                } else {
+                    resultContainer.innerHTML = `<div class="error-message">${result.error}</div>`;
+                }
+            } catch (error) {
+                resultContainer.innerHTML = `<div class="error-message">An error occurred: ${error.message}</div>`;
+            } finally {
+                loadingCircle.style.display = 'none';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Python Application Generator</h1>
+        <form id="generate-form" onsubmit="generateApp(event)">
+            <div class="form-group">
+                <label for="app_requirement">What application do you want to build today?</label><br>
+                <input type="text" id="app_requirement" name="app_requirement" required><br>
+            </div>
+            <div class="form-group">
+                <label for="fileName">Enter a name for the folder</label><br>
+                <input type="text" id="fileName" name="fileName" required><br><br>
+            </div>
+            <input type="submit" value="Generate" class="btn">
+        </form>
+        <div id="result-container"></div>
+        <div id="loading-circle" class="loading-circle"></div>
+    </div>
+</body>
+</html>
